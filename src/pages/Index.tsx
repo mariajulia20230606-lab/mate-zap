@@ -2,6 +2,7 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 import { MetricsCard } from "@/components/MetricsCard";
 import { CampaignCard } from "@/components/CampaignCard";
 import { TemplateBuilder } from "@/components/TemplateBuilder";
+import { StatusScheduler } from "@/components/StatusScheduler";
 import { 
   MessageSquare, 
   Users, 
@@ -10,7 +11,8 @@ import {
   TrendingUp, 
   AlertTriangle,
   Plus,
-  Calendar
+  Calendar,
+  Radio
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -83,10 +85,11 @@ const Index = () => {
 
         {/* Tabs Principal */}
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="campaigns">Campanhas</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="status">Status WhatsApp</TabsTrigger>
             <TabsTrigger value="contacts">Contatos</TabsTrigger>
           </TabsList>
 
@@ -169,6 +172,10 @@ const Index = () => {
             </div>
             
             <TemplateBuilder />
+          </TabsContent>
+
+          <TabsContent value="status" className="space-y-6">
+            <StatusScheduler />
           </TabsContent>
 
           <TabsContent value="contacts" className="space-y-6">
