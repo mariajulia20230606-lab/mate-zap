@@ -3,6 +3,9 @@ import { MetricsCard } from "@/components/MetricsCard";
 import { CampaignCard } from "@/components/CampaignCard";
 import { TemplateBuilder } from "@/components/TemplateBuilder";
 import { StatusScheduler } from "@/components/StatusScheduler";
+import { NewCampaignDialog } from "@/components/NewCampaignDialog";
+import { CampaignsFilter } from "@/components/CampaignsFilter";
+import { useState, useMemo } from "react";
 import { 
   MessageSquare, 
   Users, 
@@ -18,7 +21,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
-  const campaigns = [
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("title");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  
+  const [campaigns, setCampaigns] = useState([
     {
       title: "Prato do Dia - Clientes Quentes",
       status: "active" as const,
@@ -45,7 +53,37 @@ const Index = () => {
       totalMessages: 500,
       template: "Sentimos sua falta, {{nome}}! Volta logo 😊"
     }
-  ];
+  ]);
+
+  const filteredCampaigns = useMemo(() => {
+    return campaigns
+      .filter(campaign => {
+        const matchesSearch = campaign.title.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === "all" || campaign.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        let aValue, bValue;
+        switch (sortBy) {
+          case "progress":
+            aValue = a.messagesSent / a.totalMessages;
+            bValue = b.messagesSent / b.totalMessages;
+            break;
+          case "audience":
+            aValue = parseInt(a.audience.replace(/\D/g, ''));
+            bValue = parseInt(b.audience.replace(/\D/g, ''));
+            break;
+          default:
+            aValue = a[sortBy as keyof typeof a];
+            bValue = b[sortBy as keyof typeof b];
+        }
+        if (sortOrder === "asc") {
+          return aValue > bValue ? 1 : -1;
+        } else {
+          return aValue < bValue ? 1 : -1;
+        }
+      });
+  }, [campaigns, searchTerm, statusFilter, sortBy, sortOrder]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -149,14 +187,24 @@ const Index = () => {
           <TabsContent value="campaigns" className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Campanhas Ativas</h2>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nova Campanha
-              </Button>
+              <NewCampaignDialog onCreateCampaign={(campaign) => setCampaigns([...campaigns, campaign])} />
             </div>
             
+            <CampaignsFilter
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              statusFilter={statusFilter}
+              onStatusChange={setStatusFilter}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              sortOrder={sortOrder}
+              onSortOrderChange={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              totalCampaigns={campaigns.length}
+              filteredCount={filteredCampaigns.length}
+            />
+            
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {campaigns.map((campaign, index) => (
+              {filteredCampaigns.map((campaign, index) => (
                 <CampaignCard key={index} {...campaign} />
               ))}
             </div>
