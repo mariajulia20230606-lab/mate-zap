@@ -1,6 +1,6 @@
-import { MessageSquare, Bell, Settings, User } from "lucide-react";
+import { MessageSquare, Bell, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import UserMenuButton from "@/components/UserMenuButton";
 
 export const DashboardHeader = () => {
   return (
@@ -24,12 +24,7 @@ export const DashboardHeader = () => {
         <Button variant="ghost" size="sm">
           <Settings className="h-4 w-4" />
         </Button>
-        <Avatar className="h-8 w-8">
-          <AvatarImage src="" />
-          <AvatarFallback>
-            <User className="h-4 w-4" />
-          </AvatarFallback>
-        </Avatar>
+        <UserMenuButton />
       </div>
     </header>
   );

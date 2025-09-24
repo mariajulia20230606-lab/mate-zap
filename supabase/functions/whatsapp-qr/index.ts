@@ -24,25 +24,26 @@ serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const path = url.pathname.split('/').pop();
+    const pathSegments = url.pathname.split('/').filter(Boolean);
+    const endpoint = pathSegments[pathSegments.length - 1];
     
     switch (req.method) {
       case 'POST':
-        if (path === 'start-session') {
+        if (endpoint === 'start-session') {
           return await startWhatsAppSession(req);
-        } else if (path === 'scan-qr') {
+        } else if (endpoint === 'scan-qr') {
           return await handleQRScan(req);
         }
         break;
         
       case 'GET':
-        if (path === 'status') {
+        if (endpoint === 'status') {
           return await getSessionStatus(req);
         }
         break;
         
       case 'DELETE':
-        if (path === 'disconnect') {
+        if (endpoint === 'disconnect') {
           return await disconnectSession(req);
         }
         break;

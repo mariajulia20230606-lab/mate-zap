@@ -5,7 +5,6 @@ import { TemplateBuilder } from "@/components/TemplateBuilder";
 import { StatusScheduler } from "@/components/StatusScheduler";
 import { NewCampaignDialog } from "@/components/NewCampaignDialog";
 import { CampaignsFilter } from "@/components/CampaignsFilter";
-import WhatsAppQRScanner from "@/components/WhatsAppQRScanner";
 import { useState, useMemo } from "react";
 import { 
   MessageSquare, 
@@ -133,61 +132,53 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* WhatsApp QR Scanner */}
-              <div className="lg:col-span-1">
-                <WhatsAppQRScanner />
-              </div>
-              
-              {/* Status do Sistema e Atividade Recente */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Status do Sistema */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">Status do Sistema</h2>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-whatsapp rounded-full animate-pulse"></div>
-                      <span className="text-sm text-whatsapp font-medium">WhatsApp Conectado</span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <MetricsCard
-                      title="Próximo Envio"
-                      value="14:00"
-                      description="Prato do dia"
-                      icon={Clock}
-                      className="bg-success"
-                    />
-                    <MetricsCard
-                      title="Fila de Envio"
-                      value="234"
-                      description="Mensagens pendentes"
-                      icon={AlertTriangle}
-                      className="bg-warning"
-                    />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Status do Sistema */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold">Status do Sistema</h2>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-whatsapp rounded-full animate-pulse"></div>
+                    <span className="text-sm text-whatsapp font-medium">WhatsApp Conectado</span>
                   </div>
                 </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <MetricsCard
+                    title="Próximo Envio"
+                    value="14:00"
+                    description="Prato do dia"
+                    icon={Clock}
+                    className="bg-success"
+                  />
+                  <MetricsCard
+                    title="Fila de Envio"
+                    value="234"
+                    description="Mensagens pendentes"
+                    icon={AlertTriangle}
+                    className="bg-warning"
+                  />
+                </div>
+              </div>
 
-                {/* Atividade Recente */}
-                <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">Atividade Recente</h2>
-                  <div className="space-y-3">
-                    {[
-                      { time: "13:45", action: "Enviado para 234 clientes", type: "Prato do dia" },
-                      { time: "12:30", action: "Nova campanha criada", type: "Promoção weekend" },
-                      { time: "11:15", action: "125 respostas recebidas", type: "Engajamento" },
-                      { time: "10:00", action: "Sistema iniciado", type: "Status" }
-                    ].map((activity, index) => (
-                      <div key={index} className="flex items-center space-x-3 p-3 bg-card rounded-lg border">
-                        <div className="text-xs text-muted-foreground w-12">{activity.time}</div>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium">{activity.action}</div>
-                          <div className="text-xs text-muted-foreground">{activity.type}</div>
-                        </div>
+              {/* Atividade Recente */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Atividade Recente</h2>
+                <div className="space-y-3">
+                  {[
+                    { time: "13:45", action: "Enviado para 234 clientes", type: "Prato do dia" },
+                    { time: "12:30", action: "Nova campanha criada", type: "Promoção weekend" },
+                    { time: "11:15", action: "125 respostas recebidas", type: "Engajamento" },
+                    { time: "10:00", action: "Sistema iniciado", type: "Status" }
+                  ].map((activity, index) => (
+                    <div key={index} className="flex items-center space-x-3 p-3 bg-card rounded-lg border">
+                      <div className="text-xs text-muted-foreground w-12">{activity.time}</div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">{activity.action}</div>
+                        <div className="text-xs text-muted-foreground">{activity.type}</div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

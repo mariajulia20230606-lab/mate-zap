@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Smartphone, CheckCircle, XCircle, QrCode } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 interface WhatsAppSession {
@@ -107,9 +107,8 @@ const WhatsAppQRScanner = () => {
   const startStatusPolling = (sessionId: string) => {
     const interval = setInterval(async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('whatsapp-qr/status', {
+        const { data, error } = await supabase.functions.invoke(`whatsapp-qr/status?sessionId=${sessionId}`, {
           method: 'GET',
-          body: { sessionId },
         });
 
         if (error) throw error;
