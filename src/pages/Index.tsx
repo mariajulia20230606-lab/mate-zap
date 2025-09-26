@@ -5,6 +5,8 @@ import { TemplateBuilder } from "@/components/TemplateBuilder";
 import { StatusScheduler } from "@/components/StatusScheduler";
 import { NewCampaignDialog } from "@/components/NewCampaignDialog";
 import { CampaignsFilter } from "@/components/CampaignsFilter";
+import { CSVImportDialog } from "@/components/CSVImportDialog";
+import { ClientSegmentDialog } from "@/components/ClientSegmentDialog";
 import { useState, useMemo } from "react";
 import { 
   MessageSquare, 
@@ -54,6 +56,15 @@ const Index = () => {
       template: "Sentimos sua falta, {{nome}}! Volta logo 😊"
     }
   ]);
+
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [segments, setSegments] = useState<any[]>([]);
+  
+  const savedTemplates = [
+    { id: '1', name: 'Prato do Dia', content: '{Oi|Fala|E aí} {{nome}}, hoje tem {feijoada|baião de dois|torta de frango}! Vem garantir o seu 😋' },
+    { id: '2', name: 'Promoção Weekend', content: '{{nome}}, fim de semana chegando! Que tal um {almoço|jantar} especial? 🍽️' },
+    { id: '3', name: 'Recuperação', content: 'Sentimos sua falta, {{nome}}! {Volta logo|Esperamos você} para {um café|um lanche} 😊' }
+  ];
 
   const filteredCampaigns = useMemo(() => {
     return campaigns
@@ -187,7 +198,10 @@ const Index = () => {
           <TabsContent value="campaigns" className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Campanhas Ativas</h2>
-              <NewCampaignDialog onCreateCampaign={(campaign) => setCampaigns([...campaigns, campaign])} />
+              <NewCampaignDialog 
+                onCreateCampaign={(campaign) => setCampaigns([...campaigns, campaign])}
+                savedTemplates={savedTemplates}
+              />
             </div>
             
             <CampaignsFilter
@@ -230,8 +244,8 @@ const Index = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Gestão de Contatos</h2>
               <div className="flex space-x-2">
-                <Button variant="outline">Importar CSV</Button>
-                <Button>Segmentar Clientes</Button>
+                <CSVImportDialog onImportComplete={(newContacts) => setContacts([...contacts, ...newContacts])} />
+                <ClientSegmentDialog onCreateSegment={(segment) => setSegments([...segments, segment])} />
               </div>
             </div>
             

@@ -1,14 +1,23 @@
 import { useState } from "react";
-import { Wand2, Eye, Save } from "lucide-react";
+import { Wand2, Eye, Save, Upload, X, Image, Video, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 export const TemplateBuilder = () => {
   const [template, setTemplate] = useState("{Oi|Fala|E aí} {{nome}}, hoje tem {feijoada|baião de dois|torta de frango}! Vem garantir o seu 😋");
   const [previewName, setPreviewName] = useState("João");
+  const [attachments, setAttachments] = useState<Array<{
+    id: string;
+    type: 'image' | 'video';
+    file: File;
+    caption: string;
+    preview: string;
+  }>>([]);
 
   const generatePreview = () => {
     let preview = template;
@@ -23,6 +32,39 @@ export const TemplateBuilder = () => {
     });
     
     return preview;
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    files.forEach(file => {
+      if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const newAttachment = {
+            id: Date.now().toString() + Math.random(),
+            type: file.type.startsWith('image/') ? 'image' as const : 'video' as const,
+            file,
+            caption: '',
+            preview: e.target?.result as string
+          };
+          setAttachments(prev => [...prev, newAttachment]);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        toast.error("Apenas imagens e vídeos são suportados");
+      }
+    });
+  };
+
+  const updateAttachmentCaption = (id: string, caption: string) => {
+    setAttachments(prev => prev.map(att => 
+      att.id === id ? { ...att, caption } : att
+    ));
+  };
+
+  const removeAttachment = (id: string) => {
+    setAttachments(prev => prev.filter(att => att.id !== id));
   };
 
   const spintextExamples = [
@@ -69,6 +111,93 @@ export const TemplateBuilder = () => {
               <p className="text-sm">{generatePreview()}</p>
             </div>
           </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Anexos (Imagens e Vídeos)</Label>
+            <div className="flex items-center space-x-2">
+              <Input
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                onChange={handleFileUpload}
+                className="hidden"
+                id="file-upload"
+              />
+              <Label htmlFor="file-upload" className="cursor-pointer">
+                <Button variant="outline" size="sm" type="button" asChild>
+                  <span>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Adicionar Arquivo
+                  </span>
+                </Button>
+              </Label>
+            </div>
+          </div>
+
+          {attachments.length > 0 && (
+            <div className="space-y-3">
+              {attachments.map((attachment) => (
+                <div key={attachment.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {attachment.type === 'image' ? (
+                        <Image className="h-4 w-4 text-primary" />
+                      ) : (
+                        <Video className="h-4 w-4 text-primary" />
+                      )}
+                      <Badge variant="outline" className="text-xs">
+                        {attachment.type === 'image' ? 'Imagem' : 'Vídeo'}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {attachment.file.name}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeAttachment(attachment.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor={`caption-${attachment.id}`}>Legenda</Label>
+                      <Textarea
+                        id={`caption-${attachment.id}`}
+                        value={attachment.caption}
+                        onChange={(e) => updateAttachmentCaption(attachment.id, e.target.value)}
+                        placeholder="Digite a legenda do arquivo..."
+                        rows={2}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Preview</Label>
+                      <div className="border rounded overflow-hidden bg-muted/50">
+                        {attachment.type === 'image' ? (
+                          <img 
+                            src={attachment.preview} 
+                            alt="Preview" 
+                            className="w-full h-24 object-cover"
+                          />
+                        ) : (
+                          <video 
+                            src={attachment.preview} 
+                            className="w-full h-24 object-cover"
+                            controls={false}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
