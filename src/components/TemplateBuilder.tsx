@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Wand2, Eye, Save, Upload, X, Image, Video, FileText } from "lucide-react";
+import { Wand2, Eye, Save, Upload, X, Image, Video, FileText, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +12,7 @@ import { toast } from "sonner";
 export const TemplateBuilder = () => {
   const [template, setTemplate] = useState("{Oi|Fala|E aí} {{nome}}, hoje tem {feijoada|baião de dois|torta de frango}! Vem garantir o seu 😋");
   const [previewName, setPreviewName] = useState("João");
+  const [isReviewing, setIsReviewing] = useState(false);
   const [attachments, setAttachments] = useState<Array<{
     id: string;
     type: 'image' | 'video';
@@ -67,6 +69,32 @@ export const TemplateBuilder = () => {
     setAttachments(prev => prev.filter(att => att.id !== id));
   };
 
+  const handleAIReview = async () => {
+    if (!template.trim()) {
+      toast.error("Digite um texto para revisar");
+      return;
+    }
+
+    setIsReviewing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('text-reviewer', {
+        body: { text: template }
+      });
+
+      if (error) throw error;
+
+      if (data?.reviewedText) {
+        setTemplate(data.reviewedText);
+        toast.success("Texto revisado pela AI!");
+      }
+    } catch (error) {
+      console.error('Error reviewing text:', error);
+      toast.error("Erro ao revisar texto");
+    } finally {
+      setIsReviewing(false);
+    }
+  };
+
   const spintextExamples = [
     "{Oi|Olá|E aí|Fala} - Variações de cumprimento",
     "{{nome}} - Nome do cliente", 
@@ -85,7 +113,20 @@ export const TemplateBuilder = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="template">Template da Mensagem</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="template">Template da Mensagem</Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAIReview}
+              disabled={isReviewing || !template.trim()}
+              className="flex items-center space-x-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>{isReviewing ? "Revisando..." : "Revisar com AI"}</span>
+            </Button>
+          </div>
           <Textarea
             id="template"
             value={template}

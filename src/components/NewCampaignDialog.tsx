@@ -199,7 +199,7 @@ export const NewCampaignDialog = ({ onCreateCampaign, savedTemplates = [] }: New
             <CardHeader>
               <CardTitle className="text-lg flex items-center space-x-2">
                 <Calendar className="h-5 w-5" />
-                <span>Agendamento</span>
+                <span>Período da Campanha</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -216,13 +216,17 @@ export const NewCampaignDialog = ({ onCreateCampaign, savedTemplates = [] }: New
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="start-time">Horário de Início</Label>
+                      <Label htmlFor="start-time">Horário de Início (diário)</Label>
                       <Input
                         id="start-time"
                         type="time"
                         value={formData.scheduledTime}
                         onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
+                        placeholder="09:00"
                       />
+                      <p className="text-xs text-muted-foreground">
+                        Horário que a campanha inicia todos os dias
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -239,13 +243,17 @@ export const NewCampaignDialog = ({ onCreateCampaign, savedTemplates = [] }: New
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="end-time">Horário de Término</Label>
+                      <Label htmlFor="end-time">Horário de Término (diário)</Label>
                       <Input
                         id="end-time"
                         type="time"
                         value={formData.endTime}
                         onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                        placeholder="18:00"
                       />
+                      <p className="text-xs text-muted-foreground">
+                        Horário que a campanha para todos os dias
+                      </p>
                     </div>
                   </div>
                 </div>

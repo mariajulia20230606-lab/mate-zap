@@ -1,1 +1,7 @@
 project_id = "brzaxcbgydiipaszcadc"
+
+[functions.whatsapp-qr]
+verify_jwt = false
+
+[functions.text-reviewer]
+verify_jwt = true
