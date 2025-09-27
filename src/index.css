@@ -8,57 +8,57 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 248 100% 97%;
-    --foreground: 157 23% 15%;
+    --background: 0 0% 99%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 157 23% 15%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 157 23% 15%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 158 64% 52%;
+    --primary: 24 95% 53%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 41 90% 93%;
-    --secondary-foreground: 28 73% 26%;
+    --secondary: 47 96% 88%;
+    --secondary-foreground: 24 95% 53%;
 
-    --muted: 41 30% 95%;
-    --muted-foreground: 157 15% 45%;
+    --muted: 60 5% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 41 90% 93%;
-    --accent-foreground: 28 73% 26%;
+    --accent: 47 96% 88%;
+    --accent-foreground: 24 95% 53%;
 
     --destructive: 4 90% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 41 20% 90%;
-    --input: 41 20% 90%;
-    --ring: 158 64% 52%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 24 95% 53%;
 
     --radius: 0.75rem;
 
-    /* Custom restaurant/whatsapp theme */
+    /* Custom restaurant/dashboard theme */
     --whatsapp-green: 158 64% 52%;
-    --restaurant-orange: 28 73% 26%;
+    --restaurant-orange: 24 95% 53%;
     --success-light: 120 60% 85%;
     --warning-light: 45 90% 85%;
-    --gradient-primary: linear-gradient(135deg, hsl(158 64% 52%), hsl(158 64% 45%));
-    --gradient-secondary: linear-gradient(135deg, hsl(41 90% 93%), hsl(41 70% 88%));
-    --shadow-soft: 0 4px 20px -2px hsl(158 64% 52% / 0.1);
-    --shadow-glow: 0 0 40px hsl(158 64% 52% / 0.15);
+    --gradient-primary: linear-gradient(135deg, hsl(24 95% 53%), hsl(24 95% 48%));
+    --gradient-secondary: linear-gradient(135deg, hsl(47 96% 88%), hsl(47 80% 82%));
+    --shadow-soft: 0 4px 20px -2px hsl(24 95% 53% / 0.1);
+    --shadow-glow: 0 0 40px hsl(24 95% 53% / 0.15);
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 24 95% 53%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-foreground: 0 0% 100%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 0 0% 100%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary-foreground: 24 95% 53%;
 
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent: 24 100% 97%;
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent-foreground: 24 95% 53%;
 
     --sidebar-border: 220 13% 91%;
 

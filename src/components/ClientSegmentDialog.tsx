@@ -197,6 +197,21 @@ export const ClientSegmentDialog = ({ onCreateSegment }: ClientSegmentDialogProp
           </div>
 
           <div className="space-y-3">
+            <Label>Opções de Segmentação</Label>
+            <div className="flex items-center space-x-2 mb-4">
+              <Checkbox
+                id="select-all-clients"
+                checked={segmentData.criteria.tags.includes("Todos os Clientes")}
+                onCheckedChange={() => handleTagToggle("Todos os Clientes")}
+              />
+              <Label 
+                htmlFor="select-all-clients" 
+                className="text-sm font-medium cursor-pointer"
+              >
+                Todos os Clientes
+              </Label>
+            </div>
+            
             <Label>Tags Comportamentais</Label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {availableTags.map((tag) => (

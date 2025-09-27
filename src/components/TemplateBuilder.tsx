@@ -253,7 +253,13 @@ export const TemplateBuilder = () => {
         </div>
 
         <div className="flex justify-between">
-          <Button variant="outline">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              const preview = generatePreview();
+              toast.success(`Preview: "${preview}"`);
+            }}
+          >
             <Eye className="h-4 w-4 mr-2" />
             Testar Preview
           </Button>

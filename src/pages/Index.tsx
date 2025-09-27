@@ -4,9 +4,11 @@ import { CampaignCard } from "@/components/CampaignCard";
 import { TemplateBuilder } from "@/components/TemplateBuilder";
 import { StatusScheduler } from "@/components/StatusScheduler";
 import { NewCampaignDialog } from "@/components/NewCampaignDialog";
+import { FunnelCampaignDialog } from "@/components/FunnelCampaignDialog";
 import { CampaignsFilter } from "@/components/CampaignsFilter";
 import { CSVImportDialog } from "@/components/CSVImportDialog";
 import { ClientSegmentDialog } from "@/components/ClientSegmentDialog";
+import { BlacklistDialog } from "@/components/BlacklistDialog";
 import { useState, useMemo } from "react";
 import { 
   MessageSquare, 
@@ -17,10 +19,33 @@ import {
   AlertTriangle,
   Plus,
   Calendar,
-  Radio
+  Radio,
+  Play,
+  Pause,
+  Edit,
+  Eye,
+  RotateCcw,
+  MoreHorizontal,
+  ShieldX
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+
+interface Campaign {
+  id: number;
+  title: string;
+  status: "active" | "paused" | "scheduled" | "completed";
+  audience: string;
+  nextSend: string;
+  messagesSent: number;
+  totalMessages: number;
+  template: string;
+}
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,8 +53,9 @@ const Index = () => {
   const [sortBy, setSortBy] = useState("title");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   
-  const [campaigns, setCampaigns] = useState([
+  const [campaigns, setCampaigns] = useState<Campaign[]>([
     {
+      id: 1,
       title: "Prato do Dia - Clientes Quentes",
       status: "active" as const,
       audience: "850 clientes",
@@ -39,6 +65,7 @@ const Index = () => {
       template: "{Oi|Fala} {{nome}}, hoje tem feijoada completa!"
     },
     {
+      id: 2,
       title: "Promoção Fim de Semana",
       status: "scheduled" as const,
       audience: "1.2k clientes",
@@ -48,9 +75,11 @@ const Index = () => {
       template: "{{nome}}, que tal um almoço especial no fim de semana?"
     },
     {
+      id: 3,
       title: "Recuperação de Clientes Frios",
       status: "paused" as const,
       audience: "500 clientes",
+      nextSend: "Pausada",
       messagesSent: 150,
       totalMessages: 500,
       template: "Sentimos sua falta, {{nome}}! Volta logo 😊"
@@ -59,6 +88,7 @@ const Index = () => {
 
   const [contacts, setContacts] = useState<any[]>([]);
   const [segments, setSegments] = useState<any[]>([]);
+  const [blacklist, setBlacklist] = useState<string[]>([]);
   
   const savedTemplates = [
     { id: '1', name: 'Prato do Dia', content: '{Oi|Fala|E aí} {{nome}}, hoje tem {feijoada|baião de dois|torta de frango}! Vem garantir o seu 😋' },
@@ -95,6 +125,56 @@ const Index = () => {
         }
       });
   }, [campaigns, searchTerm, statusFilter, sortBy, sortOrder]);
+
+  const handleCreateCampaign = (campaign: any) => {
+    const newCampaign = {
+      id: campaigns.length + 1,
+      title: campaign.title,
+      status: campaign.status || "active" as const,
+      audience: campaign.audience,
+      nextSend: campaign.nextSend || "Agora",
+      messagesSent: campaign.messagesSent || 0,
+      totalMessages: campaign.totalMessages || parseInt(campaign.audience?.replace(/\D/g, '')) || 100,
+      template: campaign.template,
+      createdAt: new Date().toLocaleDateString()
+    };
+    setCampaigns([...campaigns, newCampaign]);
+    toast.success("Campanha criada com sucesso!");
+  };
+
+  const handleCreateSegment = (segment: any) => {
+    setSegments([...segments, segment]);
+  };
+
+  const handleAddToBlacklist = (newContacts: string[]) => {
+    setBlacklist(prev => [...new Set([...prev, ...newContacts])]);
+  };
+
+  const handleCampaignAction = (campaignId: number, action: string) => {
+    setCampaigns(prevCampaigns => prevCampaigns.map(campaign => {
+      if (campaign.id === campaignId) {
+        switch (action) {
+          case 'play':
+            return { ...campaign, status: 'active' as const };
+          case 'pause':
+            return { ...campaign, status: 'paused' as const };
+          case 'repeat':
+            return { ...campaign, messagesSent: 0, status: 'active' as const };
+          default:
+            return campaign;
+        }
+      }
+      return campaign;
+    }));
+    
+    const actionMessages = {
+      play: "Campanha ativada",
+      pause: "Campanha pausada", 
+      repeat: "Campanha reiniciada"
+    };
+    
+    toast.success(actionMessages[action as keyof typeof actionMessages] || "Ação executada");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -198,10 +278,16 @@ const Index = () => {
           <TabsContent value="campaigns" className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Campanhas Ativas</h2>
-              <NewCampaignDialog 
-                onCreateCampaign={(campaign) => setCampaigns([...campaigns, campaign])}
-                savedTemplates={savedTemplates}
-              />
+              <div className="flex items-center space-x-2">
+                <FunnelCampaignDialog 
+                  onCreateCampaign={handleCreateCampaign}
+                  savedTemplates={savedTemplates}
+                />
+                <NewCampaignDialog 
+                  onCreateCampaign={handleCreateCampaign}
+                  savedTemplates={savedTemplates}
+                />
+              </div>
             </div>
             
             <CampaignsFilter
@@ -218,8 +304,71 @@ const Index = () => {
             />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredCampaigns.map((campaign, index) => (
-                <CampaignCard key={index} {...campaign} />
+              {filteredCampaigns.map((campaign) => (
+                <Card key={campaign.id} className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <CardTitle className="text-lg">{campaign.title}</CardTitle>
+                        <Badge variant={
+                          campaign.status === 'active' ? 'default' :
+                          campaign.status === 'paused' ? 'secondary' :
+                          campaign.status === 'scheduled' ? 'destructive' : 'outline'
+                        }>
+                          {campaign.status === 'active' ? 'Ativa' :
+                           campaign.status === 'paused' ? 'Pausada' :
+                           campaign.status === 'scheduled' ? 'Agendada' : 'Finalizada'}
+                        </Badge>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleCampaignAction(campaign.id, 'play')}>
+                            <Play className="h-4 w-4 mr-2" />
+                            Ativar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCampaignAction(campaign.id, 'pause')}>
+                            <Pause className="h-4 w-4 mr-2" />
+                            Pausar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCampaignAction(campaign.id, 'repeat')}>
+                            <RotateCcw className="h-4 w-4 mr-2" />
+                            Repetir
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Eye className="h-4 w-4 mr-2" />
+                            Visualizar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Progresso</span>
+                      <span>{campaign.messagesSent}/{campaign.totalMessages}</span>
+                    </div>
+                    <Progress 
+                      value={(campaign.messagesSent / campaign.totalMessages) * 100} 
+                      className="h-2"
+                    />
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Próximo Envio</span>
+                      <span>{campaign.nextSend}</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Audiência: {campaign.audience}
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </TabsContent>
@@ -244,8 +393,12 @@ const Index = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Gestão de Contatos</h2>
               <div className="flex space-x-2">
+                <BlacklistDialog 
+                  onAddToBlacklist={handleAddToBlacklist}
+                  currentBlacklist={blacklist}
+                />
                 <CSVImportDialog onImportComplete={(newContacts) => setContacts([...contacts, ...newContacts])} />
-                <ClientSegmentDialog onCreateSegment={(segment) => setSegments([...segments, segment])} />
+                <ClientSegmentDialog onCreateSegment={handleCreateSegment} />
               </div>
             </div>
             
@@ -266,9 +419,9 @@ const Index = () => {
               />
               <MetricsCard
                 title="Blacklist"
-                value="47"
+                value={blacklist.length.toString()}
                 description="Contatos bloqueados"
-                icon={AlertTriangle}
+                icon={ShieldX}
                 className="bg-gradient-to-br from-destructive/10 to-destructive/5"
               />
             </div>
