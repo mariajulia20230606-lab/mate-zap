@@ -387,10 +387,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="status" className="space-y-6">
-            <div className="space-y-6">
-              <WhatsAppQRScanner />
-              <StatusScheduler />
-            </div>
+            <StatusScheduler />
           </TabsContent>
 
           <TabsContent value="contacts" className="space-y-6">
