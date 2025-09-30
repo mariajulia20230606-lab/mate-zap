@@ -3,6 +3,7 @@ import { MetricsCard } from "@/components/MetricsCard";
 import { CampaignCard } from "@/components/CampaignCard";
 import { TemplateBuilder } from "@/components/TemplateBuilder";
 import { StatusScheduler } from "@/components/StatusScheduler";
+import WhatsAppQRScanner from "@/components/WhatsAppQRScanner";
 import { NewCampaignDialog } from "@/components/NewCampaignDialog";
 import { FunnelCampaignDialog } from "@/components/FunnelCampaignDialog";
 import { CampaignsFilter } from "@/components/CampaignsFilter";
@@ -386,7 +387,10 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="status" className="space-y-6">
-            <StatusScheduler />
+            <div className="space-y-6">
+              <WhatsAppQRScanner />
+              <StatusScheduler />
+            </div>
           </TabsContent>
 
           <TabsContent value="contacts" className="space-y-6">
