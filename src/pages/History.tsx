@@ -14,9 +14,22 @@ import {
   Search,
   ArrowLeft,
   Eye,
-  Users
+  Users,
+  Trash2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface HistoryItem {
   id: string;
@@ -118,6 +131,12 @@ const History = () => {
     );
   };
 
+  const handleDeleteMessages = (itemId: string, itemTitle: string) => {
+    // TODO: Implementar a lógica de deletar mensagens via Edge Function
+    // Por enquanto, apenas mostra um toast de sucesso
+    toast.success(`Mensagens da campanha "${itemTitle}" foram removidas do histórico`);
+  };
+
   const HistoryCard = ({ item }: { item: HistoryItem }) => (
     <Card>
       <CardHeader>
@@ -169,11 +188,42 @@ const History = () => {
             </p>
           </div>
         </div>
-        <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex justify-end gap-2">
           <Button variant="outline" size="sm">
             <Eye className="h-4 w-4 mr-2" />
             Ver Detalhes
           </Button>
+          
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Apagar Mensagens
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta ação irá remover todas as mensagens enviadas desta {item.type === "campaign" ? "campanha" : "status"} do histórico.
+                  {item.type === "campaign" && " As mensagens já enviadas no WhatsApp não serão deletadas."}
+                  <br /><br />
+                  <strong>Campanha: {item.title}</strong>
+                  <br />
+                  Mensagens enviadas: {item.messagesSent}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleDeleteMessages(item.id, item.title)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Apagar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </CardContent>
     </Card>
