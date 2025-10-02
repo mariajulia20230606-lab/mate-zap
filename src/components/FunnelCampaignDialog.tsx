@@ -5,12 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, X, MessageSquare, Calendar, ArrowDown, Trash2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, X, MessageSquare, Calendar, ArrowDown, Trash2, Image, Video, Clock, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 interface FunnelMessage {
   id: string;
   template: string;
+  mediaType?: "none" | "image" | "video";
+  mediaFile?: File;
   delayDays: number;
   order: number;
 }
@@ -33,6 +36,11 @@ export const FunnelCampaignDialog = ({ onCreateCampaign, savedTemplates = [] }: 
     scheduledTime: "",
     endDate: "",
     endTime: "",
+    startHour: "08:00",
+    endHour: "18:00",
+    messagesPerDay: "100",
+    dailyIncrement: "10",
+    maxLimit: "500",
   });
 
   const [funnelMessages, setFunnelMessages] = useState<FunnelMessage[]>([
@@ -53,6 +61,7 @@ export const FunnelCampaignDialog = ({ onCreateCampaign, savedTemplates = [] }: 
     const newMessage: FunnelMessage = {
       id: Date.now().toString(),
       template: "",
+      mediaType: "none",
       delayDays: 1,
       order: funnelMessages.length + 1
     };
@@ -101,7 +110,14 @@ export const FunnelCampaignDialog = ({ onCreateCampaign, savedTemplates = [] }: 
         startDate: formData.scheduledDate,
         startTime: formData.scheduledTime,
         endDate: formData.endDate,
-        endTime: formData.endTime
+        endTime: formData.endTime,
+        startHour: formData.startHour,
+        endHour: formData.endHour,
+      },
+      sendingConfig: {
+        messagesPerDay: parseInt(formData.messagesPerDay),
+        dailyIncrement: parseInt(formData.dailyIncrement),
+        maxLimit: parseInt(formData.maxLimit),
       }
     };
 
@@ -117,10 +133,16 @@ export const FunnelCampaignDialog = ({ onCreateCampaign, savedTemplates = [] }: 
       scheduledTime: "",
       endDate: "",
       endTime: "",
+      startHour: "08:00",
+      endHour: "18:00",
+      messagesPerDay: "100",
+      dailyIncrement: "10",
+      maxLimit: "500",
     });
     setFunnelMessages([{
       id: "1",
       template: "",
+      mediaType: "none",
       delayDays: 0,
       order: 1
     }]);
@@ -169,30 +191,101 @@ export const FunnelCampaignDialog = ({ onCreateCampaign, savedTemplates = [] }: 
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5" />
-                  <span>Período da Campanha</span>
-                </div>
+              <CardTitle className="text-lg flex items-center space-x-2">
+                <Calendar className="h-5 w-5" />
+                <span>Período da Campanha</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="start-date">Data de Início</Label>
+                  <Input
+                    id="start-date"
+                    type="date"
+                    value={formData.scheduledDate}
+                    onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="end-date">Data de Término</Label>
+                  <Input
+                    id="end-date"
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="start-hour" className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4" />
+                    <span>Início dos Disparos</span>
+                  </Label>
+                  <Input
+                    id="start-hour"
+                    type="time"
+                    value={formData.startHour}
+                    onChange={(e) => setFormData({ ...formData, startHour: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="end-hour" className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4" />
+                    <span>Término dos Disparos</span>
+                  </Label>
+                  <Input
+                    id="end-hour"
+                    type="time"
+                    value={formData.endHour}
+                    onChange={(e) => setFormData({ ...formData, endHour: e.target.value })}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center space-x-2">
+                <TrendingUp className="h-5 w-5" />
+                <span>Configurações de Envio</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="start-date">Data de Início</Label>
+                <Label htmlFor="messages-per-day">Mensagens por Dia</Label>
                 <Input
-                  id="start-date"
-                  type="date"
-                  value={formData.scheduledDate}
-                  onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
+                  id="messages-per-day"
+                  type="number"
+                  min="1"
+                  value={formData.messagesPerDay}
+                  onChange={(e) => setFormData({ ...formData, messagesPerDay: e.target.value })}
+                  placeholder="100"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="end-date">Data de Término</Label>
+                <Label htmlFor="daily-increment">Incremento Diário</Label>
                 <Input
-                  id="end-date"
-                  type="date"
-                  value={formData.endDate}
-                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  id="daily-increment"
+                  type="number"
+                  min="0"
+                  value={formData.dailyIncrement}
+                  onChange={(e) => setFormData({ ...formData, dailyIncrement: e.target.value })}
+                  placeholder="10"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="max-limit">Limite Máximo</Label>
+                <Input
+                  id="max-limit"
+                  type="number"
+                  min="1"
+                  value={formData.maxLimit}
+                  onChange={(e) => setFormData({ ...formData, maxLimit: e.target.value })}
+                  placeholder="500"
                 />
               </div>
             </CardContent>
@@ -260,7 +353,59 @@ export const FunnelCampaignDialog = ({ onCreateCampaign, savedTemplates = [] }: 
                       )}
                       
                       <div className="space-y-2">
-                        <Label>Template da Mensagem</Label>
+                        <Label>Tipo de Mídia</Label>
+                        <Select
+                          value={message.mediaType || "none"}
+                          onValueChange={(value: "none" | "image" | "video") => 
+                            updateFunnelMessage(message.id, 'mediaType', value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Somente Texto</SelectItem>
+                            <SelectItem value="image">
+                              <div className="flex items-center space-x-2">
+                                <Image className="h-4 w-4" />
+                                <span>Imagem</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="video">
+                              <div className="flex items-center space-x-2">
+                                <Video className="h-4 w-4" />
+                                <span>Vídeo</span>
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {message.mediaType !== "none" && (
+                        <div className="space-y-2">
+                          <Label>Arquivo de Mídia</Label>
+                          <Input
+                            type="file"
+                            accept={message.mediaType === "image" ? "image/*" : "video/*"}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setFunnelMessages(funnelMessages.map(msg => 
+                                  msg.id === message.id ? { ...msg, mediaFile: file } : msg
+                                ));
+                              }
+                            }}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            {message.mediaType === "image" 
+                              ? "Formatos aceitos: JPG, PNG, WEBP" 
+                              : "Formatos aceitos: MP4, AVI, MOV"}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="space-y-2">
+                        <Label>Texto/Legenda da Mensagem</Label>
                         <Textarea
                           value={message.template}
                           onChange={(e) => updateFunnelMessage(message.id, 'template', e.target.value)}
