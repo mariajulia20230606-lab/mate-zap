@@ -10,6 +10,8 @@ import { CampaignsFilter } from "@/components/CampaignsFilter";
 import { CSVImportDialog } from "@/components/CSVImportDialog";
 import { ClientSegmentDialog } from "@/components/ClientSegmentDialog";
 import { BlacklistDialog } from "@/components/BlacklistDialog";
+import { AppSidebar } from "@/components/AppSidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { useState, useMemo } from "react";
 import { 
   MessageSquare, 
@@ -30,7 +32,6 @@ import {
   ShieldX
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -49,6 +50,7 @@ interface Campaign {
 }
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("title");
@@ -178,52 +180,55 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardHeader />
-      
-      <main className="p-6 space-y-6">
-        {/* Métricas Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <MetricsCard
-            title="Mensagens Enviadas Hoje"
-            value="1,234"
-            description="De 4.200 clientes"
-            icon={Send}
-            trend="+12%"
-          />
-          <MetricsCard
-            title="Taxa de Resposta"
-            value="28%"
-            description="Últimos 7 dias"
-            icon={MessageSquare}
-            trend="+5%"
-          />
-          <MetricsCard
-            title="Clientes Ativos"
-            value="3,854"
-            description="Responderam recentemente"
-            icon={Users}
-            trend="+8%"
-          />
-          <MetricsCard
-            title="Campanhas Ativas"
-            value="3"
-            description="2 agendadas"
-            icon={TrendingUp}
-          />
-        </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        
+        <SidebarInset className="flex-1">
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger className="-ml-1" />
+            <DashboardHeader />
+          </header>
+          
+          <main className="p-6 space-y-6">
+            {/* Métricas Principais */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <MetricsCard
+                title="Mensagens Enviadas Hoje"
+                value="1,234"
+                description="De 4.200 clientes"
+                icon={Send}
+                trend="+12%"
+                onClick={() => setActiveTab("dashboard")}
+              />
+              <MetricsCard
+                title="Taxa de Resposta"
+                value="28%"
+                description="Últimos 7 dias"
+                icon={MessageSquare}
+                trend="+5%"
+                onClick={() => setActiveTab("dashboard")}
+              />
+              <MetricsCard
+                title="Clientes Ativos"
+                value="3,854"
+                description="Responderam recentemente"
+                icon={Users}
+                trend="+8%"
+                onClick={() => setActiveTab("contacts")}
+              />
+              <MetricsCard
+                title="Campanhas Ativas"
+                value="3"
+                description="2 agendadas"
+                icon={TrendingUp}
+                onClick={() => setActiveTab("campaigns")}
+              />
+            </div>
 
-        {/* Tabs Principal */}
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="campaigns">Campanhas</TabsTrigger>
-            <TabsTrigger value="templates">Templates</TabsTrigger>
-            <TabsTrigger value="status">Status WhatsApp</TabsTrigger>
-            <TabsTrigger value="contacts">Contatos</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard" className="space-y-6">
+            {/* Content baseado na tab ativa */}
+            {activeTab === "dashboard" && (
+              <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Status do Sistema */}
               <div className="space-y-4">
@@ -274,9 +279,11 @@ const Index = () => {
                 </div>
               </div>
             </div>
-          </TabsContent>
+              </div>
+            )}
 
-          <TabsContent value="campaigns" className="space-y-6">
+            {activeTab === "campaigns" && (
+              <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Campanhas Ativas</h2>
               <div className="flex items-center space-x-2">
@@ -372,9 +379,11 @@ const Index = () => {
                 </Card>
               ))}
             </div>
-          </TabsContent>
+              </div>
+            )}
 
-          <TabsContent value="templates" className="space-y-6">
+            {activeTab === "templates" && (
+              <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Editor de Templates</h2>
               <Button variant="outline">
@@ -384,16 +393,31 @@ const Index = () => {
             </div>
             
             <TemplateBuilder />
-          </TabsContent>
+              </div>
+            )}
 
-          <TabsContent value="status" className="space-y-6">
-            <StatusScheduler />
-          </TabsContent>
+            {activeTab === "status" && (
+              <StatusScheduler />
+            )}
 
-          <TabsContent value="contacts" className="space-y-6">
+            {activeTab === "contacts" && (
+              <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Gestão de Contatos</h2>
               <div className="flex space-x-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    toast.info("Conectando ao WhatsApp para extrair contatos...");
+                    // Aqui seria a integração real com o WhatsApp
+                    setTimeout(() => {
+                      toast.success("Contatos extraídos com sucesso!");
+                    }, 2000);
+                  }}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Extrair Contatos WhatsApp
+                </Button>
                 <BlacklistDialog 
                   onAddToBlacklist={handleAddToBlacklist}
                   currentBlacklist={blacklist}
@@ -445,10 +469,12 @@ const Index = () => {
                 ))}
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
-      </main>
-    </div>
+              </div>
+            )}
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 };
 

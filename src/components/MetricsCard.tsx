@@ -8,6 +8,7 @@ interface MetricsCardProps {
   icon: LucideIcon;
   trend?: string;
   className?: string;
+  onClick?: () => void;
 }
 
 export const MetricsCard = ({ 
@@ -16,10 +17,14 @@ export const MetricsCard = ({
   description, 
   icon: Icon, 
   trend,
-  className = "" 
+  className = "",
+  onClick 
 }: MetricsCardProps) => {
   return (
-    <Card className={`transition-all duration-200 hover:shadow-lg ${className}`}>
+    <Card 
+      className={`transition-all duration-200 hover:shadow-lg ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      onClick={onClick}
+    >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
